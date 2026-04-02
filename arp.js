@@ -14,6 +14,8 @@ body?.addEventListener("click", async () => {
 
 let spread = 0;
 
+let arpNotes = ["C4", "E4", "G4", "C5", "D5"];
+
 //create a synth and connect it to the main output (your speakers)
 const synth = new Tone.Synth().toDestination();
 
@@ -23,7 +25,15 @@ let noteDuration = Tone.Time("8n").toSeconds();
 const loopA = new Tone.Loop((time) => {
     let cumlTime = time;
     for (let i = 0; i < iterations; i++) {
-        synth.triggerAttackRelease("C5", "8t", cumlTime);
+        let note = selectRandomNote();
+        synth.triggerAttackRelease(note, "8t", cumlTime);
         cumlTime += noteDuration;
     }
 }, iterations * noteDuration).start(0);
+
+
+function selectRandomNote() {
+    let i = Math.floor(Math.random()*arpNotes.length);
+    console.log(i);
+    return arpNotes.at(i);
+}
