@@ -5,8 +5,6 @@ const chordTypes = { major : [0,4,7],
     dim : [0,3,6]
 }
 
-let scaleKeySignature = "C";
-let currentScale = 0;
 
 const scaleTypes = [
     {   name :"Ionian",
@@ -40,9 +38,13 @@ const scaleTypes = [
 ]
 
 let arpNotes = ["C4", "E4", "G4", "C5", "D5"];
+
 let body = document.getElementById("body");
+
 let spreadSlider = document.getElementById("spread");
 let chordSlider = document.getElementById("chord");
+let modeSlider = document.getElementById("mode");
+let keySlider = document.getElementById("key");
 
 body?.addEventListener("click", async () => {
 	await Tone.start();
@@ -55,19 +57,26 @@ body?.addEventListener("click", async () => {
 
 let spread = 7;
 let chordInScale = 0;
+let scaleKeySignature = "C";
+let currentMode = 0;
 
 spreadSlider.oninput = function() {spread = Number(this.value); updateValues();}
 chordSlider.oninput = function() {chordInScale = Number(this.value); updateValues();}
+modeSlider.oninput = function() {currentMode = Number(this.value); updateValues();}
+keySlider.oninput = function() {
+    let keyWithOctave =  Tone.Frequency(60 + Number(this.value),"midi").toNote()
+    scaleKeySignature = keyWithOctave.slice(0,keyWithOctave.length -1);
+     updateValues();}
 
 
 function updateValues(){
-    let step = scaleTypes[currentScale].steps[chordInScale]
+    let step = scaleTypes[currentMode].steps[chordInScale]
     let chordRootWithOcatave = Tone.Frequency(Tone.Frequency(scaleKeySignature.concat("4")).toMidi() + step,"midi").toNote(); //+ step;
     let chordRoot = chordRootWithOcatave.slice(0,chordRootWithOcatave.length -1);
     console.log(chordRoot);
-    console.log(scaleTypes[currentScale].chords[chordInScale]);
-    let chordType = chordTypes[scaleTypes[currentScale].chords[chordInScale]];
-    console.log(chordTypes[scaleTypes[currentScale].chords[chordInScale]])
+    console.log(scaleTypes[currentMode].chords[chordInScale]);
+    let chordType = chordTypes[scaleTypes[currentMode].chords[chordInScale]];
+    console.log(chordTypes[scaleTypes[currentMode].chords[chordInScale]])
     establishNoteArray(spread, new chord(chordRoot, chordType))
 }
 
