@@ -45,20 +45,33 @@ let spreadSlider = document.getElementById("spread");
 let chordSlider = document.getElementById("chord");
 let modeSlider = document.getElementById("mode");
 let keySlider = document.getElementById("key");
+let pauseButton = document.getElementById("pause");
+
+let firstInteraction = true;
+
 
 body?.addEventListener("click", async () => {
-	await Tone.start();
-	console.log("audio is ready");
-    Tone.getTransport().start();
-    Tone.getTransport().bpm.value =240;
-    //Tone.getTransport().bpm.rampTo(800, 10);
-    noteDuration = Tone.Time("8n").toSeconds();
+    if (firstInteraction){
+        await Tone.start();
+        console.log("audio is ready");
+        Tone.getTransport().start();
+        Tone.getTransport().bpm.value =240;
+        //Tone.getTransport().bpm.rampTo(800, 10);
+        noteDuration = Tone.Time("8n").toSeconds();
+        firstInteraction = false;
+    }
 });
 
 let spread = 7;
 let chordInScale = 0;
 let scaleKeySignature = "C";
 let currentMode = 0;
+
+let paused = false;
+pauseButton.onclick = function() {paused ?Tone.getTransport().start() :Tone.getTransport().stop();
+    paused = !paused;
+ }
+
 
 spreadSlider.oninput = function() {spread = Number(this.value); updateValues();}
 chordSlider.oninput = function() {chordInScale = Number(this.value); updateValues();}
@@ -88,7 +101,7 @@ class chord {
         this.octave = octave;
     }
 
-    getNoteFromBetweenIntervals(start, end){
+    getNotesBetweenInterval(start, end){
         let notes = []
         console.log(start, end);
         let degreeOfChord = 0;
@@ -109,15 +122,18 @@ class chord {
 
 
 //create a synth and connect it to the main output (your speakers)
-const synth = new Tone.Synth().toDestination();
+const synth = new Tone.FMSynth().toDestination();
 
-let iterations = 3;
+let iterations = 4;
 let noteDuration = Tone.Time("8n").toSeconds();
 
 const loopA = new Tone.Loop((time) => {
     let cumlTime = time;
     for (let i = 0; i < iterations; i++) {
-        let note = selectRandomNote();
+
+        //let note = selectRandomNote();
+        let note = startRootThenRandom(i);
+
         synth.triggerAttackRelease(note, "8t", cumlTime);
         cumlTime += noteDuration;
     }
@@ -126,11 +142,37 @@ const loopA = new Tone.Loop((time) => {
 
 function selectRandomNote() {
     let i = Math.floor(Math.random()*arpNotes.length);
-    console.log(i);
     return arpNotes.at(i);
 }
 
+let previousNote = "C4";
+function startRootThenRandom(index){
+    if (index == 0){
+        return arpNotes.at(0);
+    }
+    const Notes = arpNotes;//getSubSetOfArray(previousNote,12);
+    console.log(Notes);
+    let RNoteIndex = Math.floor(Math.random()*Notes.length);
+    let note = Notes.at(RNoteIndex)
+
+    previousNote = note;
+    return note; 
+}
+
+function getSubSetOfArray(centerNote, distance){
+    let subSet = []
+    for (let i = 0; i < arpNotes.length;i++){
+        let noteInMidi = Tone.Frequency(arpNotes.at(i)).toMidi();
+        if (noteInMidi > centerNote - distance && noteInMidi < centerNote + distance){
+            subSet.push(arpNotes.at(i));
+        }
+    }
+    return subSet;
+
+}
+const arpCenterNote = 60;
+
 function establishNoteArray(spread, chord){
-    arpNotes = chord.getNoteFromBetweenIntervals(40,40+spread);
+    arpNotes = chord.getNotesBetweenInterval(arpCenterNote-Math.floor(spread/(3/1)),arpCenterNote+ Math.round(spread/(3/2)));
     console.log(arpNotes);
 }
