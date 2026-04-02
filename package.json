@@ -1,0 +1,21 @@
+{
+  "name": "gestural_arpeggiator",
+  "version": "1.0.0",
+  "description": "Open `index.html` in your web browser and start editing `sketch.js`.",
+  "license": "ISC",
+  "author": "Nathan Heaton",
+  "type": "commonjs",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "tone": "^15.1.22"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "vite": "^8.0.3"
+  }
+}
