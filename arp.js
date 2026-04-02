@@ -1,5 +1,45 @@
 import * as Tone from "tone";
 
+const chordTypes = { major : [0,4,7],
+    minor : [0,3,7],
+    dim : [0,3,6]
+}
+
+let scaleKeySignature = "C";
+let currentScale = 0;
+
+const scaleTypes = [
+    {   name :"Ionian",
+        steps:  [0, 2, 4, 5, 7, 9, 11], 
+        chords: ["major", "minor", "minor", "major", "major", "minor", "dim"]
+    },
+    {   name :"Dorian",
+        steps:  [0, 2, 3, 5, 7, 9, 10],
+        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+    },
+    {   name :"Phrygian",
+        steps:  [0, 2, 3, 5, 7, 9, 10],
+        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+    },
+    {   name :"Lydian",
+        steps:  [0, 2, 3, 5, 7, 9, 10],
+        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+    },
+    {   name :"Mixolydian",
+        steps:  [0, 2, 3, 5, 7, 9, 10],
+        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+    },
+    {   name :"Aeolian",
+        steps:  [0, 2, 3, 5, 7, 8, 10],
+        chords: ["minor", "dim", "major", "minor", "minor", "major", "major"]
+    },
+    {   name :"Locrian",
+        steps:  [0, 2, 3, 5, 7, 9, 10],
+        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+    },
+]
+
+let arpNotes = ["C4", "E4", "G4", "C5", "D5"];
 let body = document.getElementById("body");
 let spreadSlider = document.getElementById("spread");
 let chordSlider = document.getElementById("chord");
@@ -7,22 +47,29 @@ let chordSlider = document.getElementById("chord");
 body?.addEventListener("click", async () => {
 	await Tone.start();
 	console.log("audio is ready");
-
     Tone.getTransport().start();
-    // ramp up to 800 bpm over 10 seconds
-    Tone.getTransport().bpm.set(120);
-    //playNotes();
+    Tone.getTransport().bpm.value =240;
+    //Tone.getTransport().bpm.rampTo(800, 10);
+    noteDuration = Tone.Time("8n").toSeconds();
 });
 
+let spread = 7;
+let chordInScale = 0;
 
-spreadSlider.oninput = function() {
-    establishNoteArray(Number(this.value), new chord("D", chordTypes.minor))
+spreadSlider.oninput = function() {spread = Number(this.value); updateValues();}
+chordSlider.oninput = function() {chordInScale = Number(this.value); updateValues();}
+
+
+function updateValues(){
+    let step = scaleTypes[currentScale].steps[chordInScale]
+    let chordRootWithOcatave = Tone.Frequency(Tone.Frequency(scaleKeySignature.concat("4")).toMidi() + step,"midi").toNote(); //+ step;
+    let chordRoot = chordRootWithOcatave.slice(0,chordRootWithOcatave.length -1);
+    console.log(chordRoot);
+    console.log(scaleTypes[currentScale].chords[chordInScale]);
+    let chordType = chordTypes[scaleTypes[currentScale].chords[chordInScale]];
+    console.log(chordTypes[scaleTypes[currentScale].chords[chordInScale]])
+    establishNoteArray(spread, new chord(chordRoot, chordType))
 }
-
-
-// function updateValues(){
-//     //establishNoteArray(spreadSlider.ariaValueMax,)
-// }
 
 class chord {
 
@@ -50,18 +97,12 @@ class chord {
     }
 }
 
-const chordTypes = { major : [0,4,7],
-    minor : [0,3,7],
-    dim : [0,3,6]
-}
 
-
-let arpNotes = ["C4", "E4", "G4", "C5", "D5"];
 
 //create a synth and connect it to the main output (your speakers)
 const synth = new Tone.Synth().toDestination();
 
-let iterations = 5;
+let iterations = 3;
 let noteDuration = Tone.Time("8n").toSeconds();
 
 const loopA = new Tone.Loop((time) => {
