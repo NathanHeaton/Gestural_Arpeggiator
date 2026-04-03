@@ -54,8 +54,10 @@ body?.addEventListener("click", async () => {
     if (firstInteraction){
         await Tone.start();
         console.log("audio is ready");
+        
         Tone.getTransport().start();
         Tone.getTransport().bpm.value =240;
+        
         //Tone.getTransport().bpm.rampTo(800, 10);
         noteDuration = Tone.Time("8n").toSeconds();
         firstInteraction = false;
@@ -67,14 +69,16 @@ let chordInScale = 0;
 let scaleKeySignature = "C";
 let currentMode = 0;
 
-let paused = false;
-pauseButton.onclick = function() {paused ?Tone.getTransport().start() :Tone.getTransport().stop();
-    paused = !paused;
- }
+let justChangedChord = true;
 
+let paused = false;
+pauseButton.onclick = function() {
+    paused ? masterVol.mute = false : masterVol.mute = true;
+    paused = !paused;
+}
 
 spreadSlider.oninput = function() {spread = Number(this.value); updateValues();}
-chordSlider.oninput = function() {chordInScale = Number(this.value); updateValues();}
+chordSlider.oninput = function() {chordInScale = Number(this.value); justChangedChord = true; updateValues();}
 modeSlider.oninput = function() {currentMode = Number(this.value); updateValues();}
 keySlider.oninput = function() {
     let keyWithOctave =  Tone.Frequency(60 + Number(this.value),"midi").toNote()
@@ -83,6 +87,13 @@ keySlider.oninput = function() {
 
 
 function updateValues(){
+    if (justChangedChord){
+        masterVol.volume.value = defaultVol;
+        //Tone.getTransport().bpm.value = 240;
+        masterVol.volume.exponentialApproachValueAtTime(defaultVol-10, 2);
+        //Tone.getTransport().bpm.rampTo(300, 5);
+        justChangedChord=false;
+    }
     let step = scaleTypes[currentMode].steps[chordInScale]
     let chordRootWithOcatave = Tone.Frequency(Tone.Frequency(scaleKeySignature.concat("4")).toMidi() + step,"midi").toNote(); //+ step;
     let chordRoot = chordRootWithOcatave.slice(0,chordRootWithOcatave.length -1);
@@ -119,10 +130,10 @@ class chord {
     }
 }
 
-
-
-//create a synth and connect it to the main output (your speakers)
-const synth = new Tone.FMSynth().toDestination();
+// sets volum to speakers at synth to speakers
+let defaultVol = 0;
+let masterVol = new Tone.Volume(defaultVol).toDestination();
+const synth = new Tone.FMSynth().connect(masterVol);
 
 let iterations = 4;
 let noteDuration = Tone.Time("8n").toSeconds();
@@ -145,13 +156,17 @@ function selectRandomNote() {
     return arpNotes.at(i);
 }
 
-let previousNote = "C4";
+let previousNote = undefined;
+const MAX_JUMP_DISTANCE = 17;
 function startRootThenRandom(index){
-    if (index == 0){
-        return arpNotes.at(0);
+    if (index == 0){return arpNotes.at(0);}
+
+    let Notes = arpNotes;
+    if (previousNote != undefined){
+        Notes = getSubSetOfArray(previousNote, MAX_JUMP_DISTANCE);
     }
-    const Notes = arpNotes;//getSubSetOfArray(previousNote,12);
     console.log(Notes);
+
     let RNoteIndex = Math.floor(Math.random()*Notes.length);
     let note = Notes.at(RNoteIndex)
 
@@ -159,13 +174,17 @@ function startRootThenRandom(index){
     return note; 
 }
 
-function getSubSetOfArray(centerNote, distance){
+function getSubSetOfArray(previousNote, distance){
     let subSet = []
+    let centerNote = Tone.Frequency(previousNote).toMidi();
     for (let i = 0; i < arpNotes.length;i++){
         let noteInMidi = Tone.Frequency(arpNotes.at(i)).toMidi();
         if (noteInMidi > centerNote - distance && noteInMidi < centerNote + distance){
             subSet.push(arpNotes.at(i));
         }
+    }
+    if (subSet.length == 0){
+        return arpNotes;
     }
     return subSet;
 
