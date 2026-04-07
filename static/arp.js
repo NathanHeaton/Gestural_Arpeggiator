@@ -24,27 +24,26 @@ const scaleTypes = [
         chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
     },
     {   name :"Phrygian",
-        steps:  [0, 2, 3, 5, 7, 9, 10],
-        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+        steps:  [0, 1, 3, 5, 7, 8, 10],
+        chords: ["minor", "major", "major", "minor", "dim", "major", "minor"]
     },
     {   name :"Lydian",
-        steps:  [0, 2, 3, 5, 7, 9, 10],
-        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+        steps:  [0, 2, 4, 5, 6, 9, 10],
+        chords: ["major", "major", "minor", "dim", "major", "minor", "minor"]
     },
     {   name :"Mixolydian",
-        steps:  [0, 2, 3, 5, 7, 9, 10],
-        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+        steps:  [0, 2, 4, 5, 7, 9, 10],
+        chords: ["major", "minor", "dim", "major", "minor", "minor", "major"]
     },
     {   name :"Aeolian",
         steps:  [0, 2, 3, 5, 7, 8, 10],
         chords: ["minor", "dim", "major", "minor", "minor", "major", "major"]
     },
     {   name :"Locrian",
-        steps:  [0, 2, 3, 5, 7, 9, 10],
-        chords: ["minor", "minor", "major", "major", "minor", "dim", "major"]
+        steps:  [0, 1, 3, 5, 6, 8, 10],
+        chords: ["dim", "major", "minor", "minor", "major", "major", "minor"]
     },
 ]
-
 let arpNotes = ["C4", "E4", "G4", "C5", "D5"];
 
 let body = document.getElementById("body");
