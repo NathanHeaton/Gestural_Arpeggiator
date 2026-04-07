@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestural_Arpeggiator</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="http://unpkg.com/tone"></script>s
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+</head>
+<body id="body">
+    <div class="slidecontainer">
+        <p1>Spread</p1>
+        <input type="range" min="10" max="48" value="24" class="slider" id="spread">
+        <p1>Chord</p1>
+        <input type="range" min="0" max="6" value="0" class="slider" id="chord">
+        <p1>Mode</p1>
+        <input type="range" min="0" max="6" value="0" class="slider" id="mode">
+        <p1>key</p1>
+        <input type="range" min="0" max="11" value="0" class="slider" id="key">
+        <button id="pause">mute</button>
+</div>
+    <script src="../static/sketch.js"></script>
+    <script type="module" src="../static/arp.js"></script>
+</body>
+</html>
