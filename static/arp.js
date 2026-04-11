@@ -2,9 +2,18 @@
 const socket = io();
 
 let distance = 0;
+
 socket.on("distance", data => {
 	distance = data;
 	console.log(distance);
+    distance = Math.round(distance+ 5);
+    spread = distance;
+    if (spread < 10){
+        spread = 10
+    }
+    else if (spread > 48){
+        spread = 48
+    }
 	});
 	
 	
@@ -45,6 +54,7 @@ const scaleTypes = [
     },
 ]
 let arpNotes = ["C4", "E4", "G4", "C5", "D5"];
+let midiNotes = [];
 
 let body = document.getElementById("body");
 
@@ -144,6 +154,8 @@ const synth = new Tone.FMSynth().connect(masterVol);
 
 let iterations = 4;
 let noteDuration = Tone.Time("8n").toSeconds();
+window.arpNotes = arpNotes;
+window.midiNotes = midiNotes;
 
 const loopA = new Tone.Loop((time) => {
     let cumlTime = time;
@@ -157,6 +169,23 @@ const loopA = new Tone.Loop((time) => {
     }
 }, iterations * noteDuration).start(0);
 
+function sentNoteArray(spread, chord){
+    arpNotes = chord.getNotesBetweenInterval(
+        arpCenterNote - Math.floor(spread/(3/1)),
+        arpCenterNote + Math.round(spread/(3/2))
+    );
+
+    for (let i = 0; i < arpNotes.length; i++){
+        midiNotes.push(Tone.Frequency(arpNotes.at(i)).toMidi())
+    }
+
+    window.arpNotes = midiNotes; // update global reference
+}
+
+const fft = new Tone.FFT(256);
+masterVol.connect(fft);
+
+window.fft = fft;
 
 function selectRandomNote() {
     let i = Math.floor(Math.random()*arpNotes.length);
@@ -200,5 +229,12 @@ const arpCenterNote = 60;
 
 function establishNoteArray(spread, chord){
     arpNotes = chord.getNotesBetweenInterval(arpCenterNote-Math.floor(spread/(3/1)),arpCenterNote+ Math.round(spread/(3/2)));
-    console.log(arpNotes);
+    //console.log(arpNotes);
+
+    midiNotes = [];
+    for (let i = 0; i < arpNotes.length; i++){
+        midiNotes.push(Tone.Frequency(arpNotes.at(i)).toMidi())
+    }
+    console.log("midi Notes", midiNotes)
+    window.midiNotes = midiNotes; // update global reference
 }
