@@ -4,9 +4,9 @@ const socket = io();
 let distance = 0;
 
 socket.on("distance", data => {
-	distance = data;
+	distance = data + 5;
 	console.log(distance);
-    distance = Math.round(distance+ 5);
+    distance = Math.round(distance);
     spread = distance;
     if (spread < 10){
         spread = 10
