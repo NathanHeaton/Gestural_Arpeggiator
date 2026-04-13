@@ -4,7 +4,7 @@ let waveform = [];
 
 async function setup() {
   createCanvas(800, 600);
-  img1 = await loadImage("assets/keyboard.jpg");
+  //img1 = await loadImage("assets/keyboard.jpg");
 }
 
 function draw() {

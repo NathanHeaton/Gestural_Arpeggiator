@@ -3,17 +3,24 @@ const socket = io();
 
 let distance = 0;
 
+let previousDistance=0;
+
 socket.on("distance", data => {
+	if (previousDistance == data)	{	return;	}
+	
 	distance = data + 5;
-	console.log(distance);
-    distance = Math.round(distance);
+	
+	distance = Math.round(distance);
+	previousDistance = distance;
     spread = distance;
     if (spread < 10){
-        spread = 10
+        spread = 10;
     }
     else if (spread > 48){
         spread = 48
     }
+	console.log(spread);
+	updateValues();
 	});
 	
 	

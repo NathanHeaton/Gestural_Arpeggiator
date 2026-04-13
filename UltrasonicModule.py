@@ -5,9 +5,12 @@ import os
 
 SENSOR_MODE = os.getenv("live", "mock")  # default to mock on PC
 
+SENSOR_MODE = "live"
+
 if SENSOR_MODE == "live":
-    from gpiozero import DistanceSensor
-    sensor = DistanceSensor(echo=27, trigger=17)
+	print("Sensor mode is live")
+	from gpiozero import DistanceSensor
+	sensor = DistanceSensor(echo=27, trigger=17)
 
 app = Flask(__name__)
 socketio = SocketIO(app, async_mode='threading')
