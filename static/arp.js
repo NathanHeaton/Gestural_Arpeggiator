@@ -114,6 +114,10 @@ keySlider.oninput = function() {
 
 
 function updateValues(){
+	// remove when using properly ==================
+	return;
+	// ============================================
+	
     if (justChangedChord){
         masterVol.volume.value = defaultVol;
         //Tone.getTransport().bpm.value = 240;

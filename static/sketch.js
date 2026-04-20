@@ -30,3 +30,4 @@ function draw() {
     text(window.midiNotes.join(", "), 50, 50);
   }
 }
+
