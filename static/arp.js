@@ -115,7 +115,7 @@ keySlider.oninput = function() {
 
 function updateValues(){
 	// remove when using properly ==================
-	return;
+	//return;
 	// ============================================
 	
     if (justChangedChord){
