@@ -9,19 +9,23 @@ socket.on("distance", data => {
 	if (previousDistance == data)	{	return;	}
 	
 	distance = data + 5;
-	
 	distance = Math.round(distance);
 	previousDistance = distance;
     spread = distance;
-    if (spread < 10){
-        spread = 10;
+    if (spread < 5){
+        spread = 5;
     }
     else if (spread > 48){
         spread = 48
     }
-	console.log(spread);
 	updateValues();
 	});
+	
+socket.on("hand_gesture", index => {
+	chordInScale = index;
+	console.log("chord is now: ", chordInScale);
+	updateValues();
+	});	
 	
 	
 const chordTypes = { major : [0,4,7],
@@ -77,8 +81,7 @@ let firstInteraction = true;
 body?.addEventListener("click", async () => {
     if (firstInteraction){
         await Tone.start();
-        console.log("audio is ready");
-        
+                
         Tone.getTransport().start();
         Tone.getTransport().bpm.value =240;
         
@@ -121,10 +124,7 @@ function updateValues(){
     let step = scaleTypes[currentMode].steps[chordInScale]
     let chordRootWithOcatave = Tone.Frequency(Tone.Frequency(scaleKeySignature.concat("4")).toMidi() + step,"midi").toNote(); //+ step;
     let chordRoot = chordRootWithOcatave.slice(0,chordRootWithOcatave.length -1);
-    console.log(chordRoot);
-    console.log(scaleTypes[currentMode].chords[chordInScale]);
     let chordType = chordTypes[scaleTypes[currentMode].chords[chordInScale]];
-    console.log(chordTypes[scaleTypes[currentMode].chords[chordInScale]])
     establishNoteArray(spread, new chord(chordRoot, chordType))
 }
 
@@ -138,7 +138,6 @@ class chord {
 
     getNotesBetweenInterval(start, end){
         let notes = []
-        console.log(start, end);
         let degreeOfChord = 0;
         for (degreeOfChord;degreeOfChord < this.type.length; degreeOfChord++){
             let rootMidi = Tone.Frequency(`${this.root}${this.octave}`).toMidi()+ this.type[degreeOfChord];
@@ -208,7 +207,6 @@ function startRootThenRandom(index){
     if (previousNote != undefined){
         Notes = getSubSetOfArray(previousNote, MAX_JUMP_DISTANCE);
     }
-    console.log(Notes);
 
     let RNoteIndex = Math.floor(Math.random()*Notes.length);
     let note = Notes.at(RNoteIndex)
@@ -236,12 +234,10 @@ const arpCenterNote = 60;
 
 function establishNoteArray(spread, chord){
     arpNotes = chord.getNotesBetweenInterval(arpCenterNote-Math.floor(spread/(3/1)),arpCenterNote+ Math.round(spread/(3/2)));
-    //console.log(arpNotes);
 
     midiNotes = [];
     for (let i = 0; i < arpNotes.length; i++){
         midiNotes.push(Tone.Frequency(arpNotes.at(i)).toMidi())
     }
-    console.log("midi Notes", midiNotes)
     window.midiNotes = midiNotes; // update global reference
 }
